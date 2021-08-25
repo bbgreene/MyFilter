@@ -166,7 +166,9 @@ bool MyFilterAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* MyFilterAudioProcessor::createEditor()
 {
-    return new MyFilterAudioProcessorEditor (*this);
+//    return new MyFilterAudioProcessorEditor (*this);
+    
+    return new juce::GenericAudioProcessorEditor(*this);
 }
 
 //==============================================================================
@@ -181,6 +183,36 @@ void MyFilterAudioProcessor::setStateInformation (const void* data, int sizeInBy
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout
+    MyFilterAudioProcessor::createParameterLayout()
+{
+    juce::AudioProcessorValueTreeState::ParameterLayout layout;
+    
+    layout.add(std::make_unique<juce::AudioParameterFloat>("HighPass Freq",
+                                                           "HighPass Freq",
+                                                           juce::NormalisableRange<float>(20.f, 20000.f, 1.f, 1.f),
+                                                           20.f));
+    
+    layout.add(std::make_unique<juce::AudioParameterFloat>("LowPass Freq",
+                                                           "LowPass Freq",
+                                                           juce::NormalisableRange<float>(20.f, 20000.f, 1.f, 1.f),
+                                                           20000.f));
+    
+    juce::StringArray stringArray;
+    for( int i = 0; i < 4; ++i)
+    {
+        juce::String str;
+        str << (12 + i*12);
+        str << " db/Oct";
+        stringArray.add(str);
+    }
+    
+    layout.add(std::make_unique<juce::AudioParameterChoice>("HighPass Slope", "HighPass Slope", stringArray, 0));
+    layout.add(std::make_unique<juce::AudioParameterChoice>("LowPass Slope", "LowPass Slope", stringArray, 0));
+    
+    return layout;
 }
 
 //==============================================================================
